@@ -3,8 +3,6 @@ Netflix User Intelligence – Data Engineering Project
 Overview
 This project is developed for the JADS Data Engineering course (Assignment 2). The goal is to design and implement a Big Data Architecture and two Spark data processing pipelines that generate both real-time and historical insights into user behavior on a streaming platform. The project is based on the Netflix 2025 User Behavior Dataset from Kaggle, which contains user activity, subscription, and content data.
 
-The system is implemented on Google Cloud Platform (GCP) using Apache Spark, Kafka, BigQuery, and Looker Studio, and deployed using Docker Compose as demonstrated in Lab 6 – Implementing Big Data Architectures with Containers.
-
 ---
 
 Dataset Description
