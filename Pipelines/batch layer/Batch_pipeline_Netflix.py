@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 from pyspark.sql import SparkSession
@@ -12,13 +12,13 @@ from pyspark.sql.functions import col, count, when, isnan, isnull, sum as spark_
 # 1. Configuration
 # -------------------------------------------------------------------
 project_id = "de2025-471807"
-bq_dataset_raw = "netflix"  # Dataset for raw data
 bq_dataset_processed = "netflix_processed"  # Dataset for cleaned/processed data and aggregations
 temp_bucket = "netflix-group5-temp"
+gcs_bucket = "netflix_data_25"  # GCS bucket for raw data
 processed_path = "/home/jovyan/data/processed/"  # Optional: also save to local CSV
 
 # -------------------------------------------------------------------
-# 2. Spark session setup with BigQuery
+# 2. Spark session setup with GCS and BigQuery support
 # -------------------------------------------------------------------
 sparkConf = SparkConf()
 sparkConf.setMaster("spark://spark-master:7077")
@@ -38,39 +38,45 @@ conf = spark.sparkContext._jsc.hadoopConfiguration()
 conf.set("fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
 conf.set("fs.AbstractFileSystem.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS")
 
-print("✅ Spark session created with BigQuery support")
+print("✅ Spark session created with GCS")
 print(f"   App Name: BatchPipelineNetflix")
-print(f"   Raw Dataset: {bq_dataset_raw}")
-print(f"   Processed Dataset: {bq_dataset_processed} (cleaned tables + aggregations)")
+print(f"   GCS Bucket: {gcs_bucket} (reading raw data)")
+print(f"   Processed Dataset: {bq_dataset_processed} (writing cleaned tables + aggregations)")
 
 
-# In[2]:
+# In[5]:
 
 
 # -------------------------------------------------------------------
-# 3. Load all tables from BigQuery
+# 3. Load all tables from Google Cloud Storage
 # -------------------------------------------------------------------
+# Map table names to CSV files in GCS
 tables = {
-    "users": "Users",
-    "movies": "Movies",
-    "watch_history": "WatchHistory",
-    "recommendation_logs": "RecommendationLogs",
-    "reviews": "Reviews",
-    "search_logs": "SearchLogs"
+    "users": "users.csv",
+    "movies": "movies.csv",
+    "watch_history": "watch_history.csv",
+    "recommendation_logs": "recommendation_logs.csv",
+    "reviews": "reviews.csv",
+    "search_logs": "search_logs.csv"
 }
 
 dataframes = {}
-for name, table_name in tables.items():
-    df = spark.read.format("bigquery").load(f"{project_id}.{bq_dataset_raw}.{table_name}")
+for name, csv_file in tables.items():
+    gcs_path = f"gs://{gcs_bucket}/{csv_file}"
+    print(f"Loading {name} from: {gcs_path}")
+    df = spark.read \
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .csv(gcs_path)
     dataframes[name] = df
     print(f"✅ Loaded {name}: {df.count()} rows, {len(df.columns)} columns")
 
 print("\n" + "="*80)
-print("📊 DATA LOADING COMPLETE")
+print("📊 DATA LOADING COMPLETE (from GCS)")
 print("="*80)
 
 
-# In[3]:
+# In[6]:
 
 
 # -------------------------------------------------------------------
@@ -106,7 +112,7 @@ print("✅ Schema inspection complete")
 print("="*80)
 
 
-# In[4]:
+# In[7]:
 
 
 # -------------------------------------------------------------------
@@ -164,7 +170,7 @@ for name, df in dataframes.items():
     quality_reports[name] = {"missing": missing, "duplicates": duplicates}
 
 
-# In[5]:
+# In[8]:
 
 
 # -------------------------------------------------------------------
@@ -247,7 +253,7 @@ for name, df in dataframes.items():
     print(f"✅ {name}: {original_count} → {cleaned_count} rows, {original_cols} → {cleaned_cols} cols (removed {removed_rows} rows, {removed_cols} cols)")
 
 
-# In[6]:
+# In[9]:
 
 
 # -------------------------------------------------------------------
@@ -283,7 +289,7 @@ print(f"\n✅ All cleaned data written to BigQuery dataset: {bq_dataset_processe
 print("\n🎉 Data quality check and cleaning completed!")
 
 
-# In[13]:
+# In[10]:
 
 
 # -------------------------------------------------------------------
@@ -350,7 +356,7 @@ print("\n✅ Star schema join complete!")
 print(f"   Final joined dataset: {joined_df.count()} rows, {len(joined_df.columns)} columns")
 
 
-# In[19]:
+# In[11]:
 
 
 # -------------------------------------------------------------------
@@ -391,7 +397,7 @@ print(f"   Rows with watch_date_parsed: {joined_df.filter(col('watch_date_parsed
 print("\n✅ Data transformation complete!")
 
 
-# In[20]:
+# In[12]:
 
 
 # -------------------------------------------------------------------
@@ -443,7 +449,7 @@ print("\n📊 Top genres by watch time:")
 genre_performance.show(10, truncate=False)
 
 
-# In[23]:
+# In[13]:
 
 
 # -------------------------------------------------------------------
@@ -525,7 +531,7 @@ cohort_retention.show(20, truncate=False)
 print("\n✅ All user engagement aggregations complete!")
 
 
-# In[24]:
+# In[14]:
 
 
 # -------------------------------------------------------------------
@@ -593,7 +599,7 @@ print(f"     • monthly_active_users (optional)")
 print("\n🚀 Ready for Looker Studio dashboard creation!")
 
 
-# In[25]:
+# In[15]:
 
 
 # Stop the Spark context
