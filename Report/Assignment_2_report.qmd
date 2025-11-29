@@ -11,8 +11,6 @@ lof: true
 number-sections: true
 ---
 
-\newpage
-
 # Overview of the Data Pipelines
 
 ## Business Context
@@ -93,7 +91,35 @@ To support near-real-time monitoring, the streaming pipeline performs time-windo
 
 # Reflection on the design and implementation of the Data Architecture and Data Pipelines
 
-The design of the data architecture centred on the architecture model, which was selected to support both accurate historical analysis and low-latency event processing. While this approach suited the characteristics of the dataset and the project goals, an alternative design could have been a Kappa Architecture. In a Kappa-based system, all processing is carried out through a continuous streaming model, and historical results are derived by replaying events rather than maintaining a separate batch layer. This design simplifies the system by removing duplication between batch and speed layers and can reduce operational overhead. However, it would have required the availability of the historical dataset as an ordered event stream, which was not the case for this project. Moreover, the batch outputs used for monthly engagement and cohort analysis benefit from a stable and complete dataset, something that a pure streaming architecture would not provide without substantial preprocessing. Therefore, the Data Architecture offered clearer separation of responsibilities and reduced complexity at the analytical level.
+## Alternative Architectural Design: Traditional Lambda Architecture
+
+The design of the data architecture centred on a unified big data processing pattern using Apache Spark for both batch and streaming workloads, which was selected to support both accurate historical analysis and low-latency event processing within a single computational framework. While this approach suited the characteristics of the dataset and the project goals, an alternative design would have been the traditional Lambda Architecture.
+
+A traditional Lambda Architecture would have employed separate processing systems for the batch and streaming layers. For example, this could involve using Hadoop MapReduce or a dedicated batch-oriented framework for historical processing, while deploying Apache Flink or Apache Storm for real-time stream processing. This separation provides complete independence between the two processing modes, allowing each system to be optimized and scaled independently without resource contention.
+
+Lambda Architecture provides fault isolation and independent scalability, which can be advantageous in large-scale production systems. If the streaming layer experiences issues or needs to be redeployed, the batch layer continues operating independently, ensuring that historical analytics remain unaffected. Each layer can be scaled independently based on its specific workload demands.
+
+However, this approach introduces significant operational complexity. Maintaining two different processing engines requires duplicate infrastructure, separate deployment pipelines, and potentially divergent code implementations for similar analytical logic. Development teams must possess expertise in multiple technologies, and reconciling results between the batch and streaming views can become challenging due to subtle differences in processing semantics. 
+
+By contrast, the unified Spark-based approach reduces this complexity substantially. All processing logic is consolidated within a single engine using PySpark, enabling code reuse across both batch and streaming pipelines. Worker resources are shared between batch and streaming jobs, improving resource utilization. Data transformation semantics remain consistent across both pipelines, as both leverage the same DataFrame API and SQL functions. Deployment is simplified through a single Docker Compose configuration that manages the entire Spark cluster, Kafka infrastructure, and application layer together.
+
+## **Comparison: Strengths and Weaknesses**
+
+**Unified Spark Architecture (Implemented):**
+
+-   Strengths: Single cluster reduces operational complexity and infrastructure costs. PySpark code is reused across both pipelines, ensuring consistent transformation logic and requiring expertise in only one framework. Shared worker resources improve utilization, and unified Docker Compose deployment simplifies maintenance and versioning.
+
+-   Weaknesses: Batch and streaming jobs compete for the same resources, limiting independent scaling. Coupled deployment means cluster updates affect both pipelines simultaneously, and shared infrastructure creates a common failure domain.
+
+## **Traditional Lambda Architecture (Alternative):**
+
+-   Strengths: Independent scaling and optimization for each layer. Batch and streaming systems can use specialized frameworks best suited to their requirements. Isolated failure domains prevent cascading issues between layers.
+
+-   Weaknesses: Requires maintaining two separate processing systems, increasing operational overhead and infrastructure costs. Analytical logic must be implemented twice in different frameworks, requiring broader team expertise. Reconciling outputs between batch and streaming layers can be challenging due to different processing semantics.
+
+Given the project scope and resource constraints, the unified Spark-based architecture offered a pragmatic balance, maintaining clear separation between historical and real-time analytics while avoiding the complexity of managing multiple processing frameworks.
+
+## **Implementation Challenges and Solutions**
 
 Several challenges arose during implementation. One of the first issues involved selecting the correct storage location for the input data. The initial attempt involved loading data directly from BigQuery, which proved less practical for iterative development and data cleaning. Transitioning to Google Cloud Storage provided a more flexible and transparent workspace for managing raw files. This improvement was implemented after collaborative troubleshooting within the group.
 
@@ -131,7 +157,7 @@ Through this structured task allocation, the team delivered a functional Data Ar
 
 # References
 
-Sayeeduddin. (2025). Netflix 2025 user behavior dataset (210k records) \[Data set\]. Kaggle.[ https://www.kaggle.com/datasets/sayeeduddin/netflix-2025user-behavior-dataset-210k-records/data](https://www.kaggle.com/datasets/sayeeduddin/netflix-2025user-behavior-dataset-210k-records/data)
+Sayeeduddin. (2025). Netflix 2025 user behavior dataset (210k records) \[Data set\]. Kaggle.<https://www.kaggle.com/datasets/sayeeduddin/netflix-2025user-behavior-dataset-210k-records/data>
 
 \newpage
 
