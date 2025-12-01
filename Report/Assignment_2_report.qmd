@@ -35,7 +35,7 @@ The data architecture implemented for this project follows a unified big data pr
 
 Apache Spark forms the computational core of the architecture. It is used to execute both high-throughput batch jobs and continuous streaming workloads in a distributed manner across a Spark master and multiple workers. Google Cloud Storage is used as the central repository for raw data, with separate folders for historical CSV files and simulated streaming JSON events. Kafka facilitates real-time event ingestion by receiving streaming messages from a custom Python producer and making them available to the Spark streaming engine. Google BigQuery acts as the unified serving layer, storing both historical aggregations and real-time metrics, supporting efficient analytical queries and dashboard creation through Looker Studio.
 
-This unified architectural approach provides several advantages over traditional multi-system architectures: simplified operational management through a single cluster infrastructure, consistent processing logic using PySpark across both batch and streaming pipelines, efficient resource utilization through shared worker nodes, and reduced codebase complexity. The design ensures scalable, fault-tolerant, and reproducible data processing while enabling the integration of multiple data modalities and latency requirements within a cohesive framework. See the full architecture diagram at @fig-architecture.
+This unified architectural approach provides several advantages over traditional multi-system architectures: simplified operational management through a single cluster infrastructure, consistent processing logic using PySpark across both batch and streaming pipelines, efficient resource utilization through shared worker nodes, and reduced codebase complexity. The design ensures scalable, fault-tolerant, and reproducible data processing while enabling the integration of multiple data modalities and latency requirements within a cohesive framework. See the full architecture diagram at @fig-architecture
 
 ## System Components
 
@@ -163,7 +163,7 @@ Sayeeduddin. (2025). Netflix 2025 user behavior dataset (210k records) \[Data se
 
 # Appendix
 
-![Data Architecture](images/d9d490b9-718c-46c5-afec-be02e89463ab.jpg){#fig-architecture}
+![Data Architecture](images/Flowchart DE (3)-1.png){#fig-architecture}
 
 ![Batch & Streaming Pipeline](images/64734763-d8f4-4e32-80fc-cebd2b4bcc27.jpg){#fig-stream-batch}
 
