@@ -82,7 +82,7 @@ print("="*80)
 # 4. Inspect Schemas and Key Relationships
 # -------------------------------------------------------------------
 print("\n" + "="*80)
-print("🔍 SCHEMA INSPECTION")
+print("SCHEMA INSPECTION")
 print("="*80)
 
 for name, df in dataframes.items():
@@ -176,7 +176,7 @@ for name, df in dataframes.items():
 # 6. Clean data: Remove missing values, empty columns, and duplicates
 # -------------------------------------------------------------------
 print("\n" + "="*80)
-print("🧹 DATA CLEANING")
+print("DATA CLEANING")
 print("="*80)
 def clean_dataframe(df, critical_columns=None):
     """
@@ -295,7 +295,7 @@ print("\nData quality check and cleaning completed!")
 # 8. Join Tables (Star Schema)
 # -------------------------------------------------------------------
 print("\n" + "="*80)
-print("🔗 JOINING TABLES (STAR SCHEMA)")
+print("JOINING TABLES (STAR SCHEMA)")
 print("="*80)
 print("\nBuilding star schema: watch_history as fact table, others as dimensions...")
 
@@ -362,7 +362,7 @@ print(f"   Final joined dataset: {joined_df.count()} rows, {len(joined_df.column
 # 9. Transform Data (Parse Timestamps, Prepare for Aggregations)
 # -------------------------------------------------------------------
 print("\n" + "="*80)
-print("🔄 DATA TRANSFORMATION")
+print("DATA TRANSFORMATION")
 print("="*80)
 
 from pyspark.sql.functions import to_timestamp
@@ -403,7 +403,7 @@ print("\n✓ Data transformation complete!")
 # 10. Content Performance Aggregations
 # -------------------------------------------------------------------
 print("\n" + "="*80)
-print("📈 CONTENT PERFORMANCE AGGREGATIONS")
+print("CONTENT PERFORMANCE AGGREGATIONS")
 print("="*80)
 
 # Filter out null values for aggregations
