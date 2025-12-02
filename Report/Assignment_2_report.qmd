@@ -163,7 +163,7 @@ Sayeeduddin. (2025). Netflix 2025 user behavior dataset (210k records) \[Data se
 
 # Appendix
 
-![Data Architecture](images/Flowchart DE (3)-1.png){#fig-architecture}
+![Data Architecture](images/Flowchart%20DE%20(3)-1.png){#fig-architecture}
 
 ![Batch & Streaming Pipeline](images/64734763-d8f4-4e32-80fc-cebd2b4bcc27.jpg){#fig-stream-batch}
 
